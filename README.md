@@ -1,193 +1,178 @@
-# 🎵 Music Recommender Simulation
+# Applied AI Music Recommender
 
 ## Project Summary
 
-This project simulates a simple content-based music recommender system. Songs are represented using features such as genre, mood, energy, tempo, and valence. A user profile stores preferred values for these features to represent a listener’s taste.
+This project extends my earlier **Music Recommender Simulation (Module 3)** into a more reliable applied AI system.
 
-The recommender compares each song’s attributes to the user’s preferences and calculates a weighted score based on how closely they match. Songs with higher scores are ranked higher and returned as recommendations. This simulation demonstrates how recommendation systems transform structured data into predictions by combining feature similarity with a ranking algorithm.
+The original project implemented a **content-based recommender** that ranked songs based on feature similarity (genre, mood, energy, tempo, and valence). It calculated a weighted score for each song and returned the highest ranked recommendations along with explanations.
 
----
-
-## How The System Works
-
-The system works by comparing song attributes to a user’s taste profile and calculating how closely they match.
-
-Each **Song** includes the following features from the dataset:
-
-- genre
-- mood
-- energy
-- tempo_bpm
-- valence
-
-The **UserProfile** stores the listener’s preferred values for these features, such as their favorite genre, mood, and preferred energy level.
-
-The **Recommender** calculates a score for every song in the catalog using a weighted scoring rule:
-
-- If the song’s **genre matches** the user’s preferred genre, it adds a large score bonus.
-- If the **mood matches**, it adds a smaller bonus.
-- For numerical features like **energy**, **tempo**, and **valence**, the score increases when the song’s value is closer to the user’s preference.
-
-After calculating scores for all songs, the system **sorts songs by score from highest to lowest**. The top ranked songs are returned as recommendations.
-
-This approach simulates a **content-based filtering recommender**, where recommendations are based on song attributes rather than other users’ listening behavior.
+This extended version adds a **reliability and testing layer** that evaluates recommendation quality, checks for contradictory user inputs, and logs system behavior to make the AI system more transparent and trustworthy.
 
 ---
 
-## Algorithm Overview
+## Why This Project Matters
 
-![Recommendation Algorithm](algorithm_flow.png)
+Recommendation systems influence what people watch, read, and listen to every day. Even simple algorithms can produce convincing results, but they may also introduce bias or unreliable outputs.
 
-The diagram above shows the flow of the recommendation process:
-
-1. A **user profile** defines listening preferences.
-2. The system **loads songs from the dataset**.
-3. Each song is **scored based on feature similarity**.
-4. Scores are adjusted using the **weighted scoring rule**.
-5. A **diversity penalty** reduces repeated artists or genres.
-6. Songs are **ranked by final score**.
-7. The system **returns the top recommendations**.
+This project demonstrates how to move from a simple prototype toward a **trustworthy AI system** by adding validation, guardrails, and explainability to the recommendation process.
 
 ---
 
-## Algorithm Recipe
+## System Architecture
 
-The recommender calculates a score for each song based on how closely the song’s features match the user's preferences.
+The system is organized as a modular pipeline where user preferences and song data flow through several components.
 
-Scoring rules:
+![System Architecture](assets/system_architecture.png)
 
-- **+1.0 points** if the song's genre matches the user's favorite genre.
-- **+1.5 points** if the song's mood matches the user's favorite mood.
+### Component Overview
 
-Similarity scoring for numerical features:
+**User Preferences**\
+Input describing the user's taste (genre, mood, energy level, etc.)
 
-- **Energy similarity**  
-  `1 - abs(song_energy - target_energy)`  
-  weighted by **4.0**
-  
-- **Tempo similarity**  
-  `1 - min(abs(song_tempo - target_tempo) / 100, 1)`  
-  weighted by **1.5**
+**Song Loader**\
+Loads the song catalog from `songs.csv`.
 
-- **Valence similarity**  
-  `1 - abs(song_valence - target_valence)`  
-  weighted by **1.0**
+**Scoring Engine**\
+Calculates similarity scores between user preferences and each song.
 
-After scoring every song in the dataset, the system sorts the songs by total score from highest to lowest and returns the top recommendations.
+**Ranking and Diversity Layer**\
+Ranks songs by score and applies a diversity penalty to avoid repetitive
+results.
 
----
+**Reliability Checker**\
+Evaluates recommendation quality, detects contradictory preferences, and
+assigns confidence warnings if needed.
 
-## User Preference vs Song Feature Comparison
+**Output Layer**\
+Displays final recommendations with explanations and reliability
+messages.
 
-![Preference Radar](preference_radar.png)
+**Testing / Evaluation Profiles**\
+Predefined test profiles used to check consistency and system behavior.
 
-This radar chart compares a user's listening preferences with the feature profile of a recommended song.  
-The closer the shapes overlap, the better the song matches the user's taste profile.
-
----
-
-## Example Recommendation Output
-
-Example recommendations for a **High-Energy Pop** user profile:
-
-1. Sunrise City by Neon Echo
-   Genre: pop | Mood: happy
-   Score: 6.18
-   Why: genre match (+1.0), mood match (+1.5), energy similarity (+3.68)
-
-2. Rooftop Lights by Indigo Parade
-   Genre: indie pop | Mood: happy
-   Score: 4.94
-   Why: mood match (+1.5), energy similarity (+3.44)
-
-3. Gym Hero by Max Pulse
-   Genre: pop | Mood: intense
-   Score: 4.38
-   Why: genre match (+1.0), energy similarity (+3.88), genre diversity penalty (-0.50)
+**Human Review**\
+Allows developers or users to inspect results and judge recommendation
+quality.
 
 ---
 
-## CLI Demo
+## Setup Instructions
 
-Below is an example of the recommender running in the terminal.
+Clone the repository:
 
-![CLI Demo](recommender_cli_demo.png)
-
----
-
-## Getting Started
-
-### Setup
-
-1. Create a virtual environment (optional but recommended):
-
-```bash
-python -m venv .venv
-source .venv/bin/activate      # Mac or Linux
-.venv\Scripts\activate         # Windows
+``` bash
+git clone https://github.com/minh1608/applied-ai-music-recommender.git
+cd applied-ai-music-recommender
 ```
 
-2. Install dependencies
+Create a virtual environment (optional):
 
-```bash
+``` bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+``` bash
 pip install -r requirements.txt
 ```
 
-3. Run the app:
+Run the recommender:
 
-```bash
+``` bash
 python -m src.main
 ```
 
-### Running Tests
+---
 
-Run the starter tests with:
+## Sample Interactions
 
-```bash
-pytest
-```
+### Example 1 --- High Energy Pop Listener
 
-You can add more tests in `tests/test_recommender.py`.
+Input:
+
+    genre = pop
+    mood = happy
+    energy = 0.9
+
+Output:
+
+    1. Sunrise City – Score: 6.18
+       Reason: genre match, mood match, energy similarity
+
+    2. Rooftop Lights – Score: 4.94
+       Reason: mood match, energy similarity
 
 ---
 
-## Experiments You Tried
+### Example 2 --- Chill Lofi Listener
 
-During evaluation, the scoring weights were modified to test how the system responds to different feature importance.
+Input:
 
-The weight of **energy similarity** was increased while the weight of **genre matching** was reduced. This experiment showed that recommendations became more sensitive to intensity and musical energy.
+    genre = lofi
+    mood = chill
+    energy = 0.35
 
-This demonstrated how small weight changes can significantly affect recommendation rankings.
+Output:
 
----
+    1. Library Rain – Score: 6.50
+       Reason: genre match, mood match, energy similarity
 
-## Limitations and Bias
-
-This recommender has several limitations:
-
-- The dataset is very small (18 songs).
-- It does not analyze lyrics, artists' popularity, or listening history.
-- Certain genres may appear more frequently due to dataset imbalance.
-- User preferences are simplified and may not fully represent real musical taste.
-
-These limitations are discussed further in the **Model Card**.
-
-### Potential Bias
-
-This recommender may over-prioritize certain features, especially genre. Because genre has a strong weight in the scoring rule, the system may repeatedly recommend songs from the same genre even if other songs match the user's mood or energy well. This could reduce diversity in recommendations and create a small "filter bubble" effect.
+    2. Midnight Coding – Score: 5.72
+       Reason: genre match, mood match, energy similarity
 
 ---
 
-## Model Card
+### Example 3 --- Conflicting Preferences
 
-For a full description of the model design, evaluation process, and biases, see:
+Input:
 
-[Model Card](model_card.md)
+    genre = ambient
+    mood = intense
+    energy = 0.9
+
+Output:
+
+    Warning: user preferences may be contradictory.
+
+    Recommendations returned with lower confidence.
+
+---
+
+## Design Decisions
+
+Several design choices were made to keep the system understandable while improving reliability.
+
+**Content-based filtering** was chosen because the dataset is small and does not include user listening history.
+
+A **weighted scoring system** was used instead of machine learning to keep the model interpretable.
+
+A **diversity penalty** was introduced to reduce repetitive recommendations from the same genre.
+
+A **reliability checker** was added to detect contradictory preferences and provide warnings when recommendations may be weak or inconsistent.
+
+These choices prioritize **transparency and explainability** over complexity.
+
+---
+
+## Testing Summary
+
+The system was evaluated using several user preference profiles, including:
+
+-   high-energy pop listeners
+-   chill lofi listeners
+-   rock listeners
+-   conflicting preference profiles
+
+Testing showed that the recommender produced consistent rankings for well-defined profiles. However, contradictory inputs sometimes produced weaker matches, which motivated the addition of the reliability checker.
 
 ---
 
 ## Reflection
 
-Building this recommender helped illustrate how recommendation systems transform structured data into ranked predictions. Even a simple scoring model can generate results that feel meaningful to users when the system captures important features like genre, mood, and energy.
+This project showed how even simple recommendation algorithms can feel intelligent when they combine structured data with ranking logic.
 
-One surprising observation was how sensitive the system is to weight changes. When the energy weight increased and the genre weight decreased, the recommendations shifted significantly toward songs with similar intensity levels. This demonstrated how small adjustments in scoring rules can strongly influence recommendation outcomes.
+More importantly, it highlighted how **AI systems need reliability checks and transparency**. Without evaluation and guardrails, recommendation systems can easily produce misleading outputs or reinforce bias.
+
+Building this system reinforced the importance of explainability, testing, and responsible design when creating AI-driven applications.
