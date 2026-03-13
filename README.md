@@ -88,7 +88,7 @@ python -m src.main
 
 ## Sample Interactions
 
-### Example 1 --- High Energy Pop Listener
+### Example 1. High Energy Pop Listener
 
 Input:
 
@@ -106,7 +106,7 @@ Output:
 
 ---
 
-### Example 2 --- Chill Lofi Listener
+### Example 2. Chill Lofi Listener
 
 Input:
 
@@ -124,7 +124,7 @@ Output:
 
 ---
 
-### Example 3 --- Conflicting Preferences
+### Example 3. Conflicting Preferences
 
 Input:
 
