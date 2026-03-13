@@ -181,10 +181,36 @@ This reliability layer makes the recommender more trustworthy by helping users u
 
 ---
 
-## Reflection
+## Reflection and Ethics
 
-This project showed how even simple recommendation algorithms can feel intelligent when they combine structured data with ranking logic.
+### Limitations and Bias
 
-More importantly, it highlighted how **AI systems need reliability checks and transparency**. Without evaluation and guardrails, recommendation systems can easily produce misleading outputs or reinforce bias.
+This recommender system has several limitations. The dataset is very small (18 songs), which means it cannot represent the full diversity of musical tastes. Because the scoring system relies mainly on structured attributes like genre, mood, and energy, it cannot capture deeper aspects of music such as lyrics, cultural context, or evolving listener preferences.
 
-Building this system reinforced the importance of explainability, testing, and responsible design when creating AI-driven applications.
+The scoring weights may also introduce bias. For example, energy similarity currently has the strongest influence on the final score. As a result, songs with similar energy levels may rank highly even if their genre or mood is less relevant. This demonstrates how small design decisions in recommendation algorithms can unintentionally shape the results users see.
+
+### Potential Misuse
+
+If a system like this were used in a real platform, it could reinforce narrow recommendation patterns or “filter bubbles.” Users might repeatedly receive music from the same genres or artists, reducing exposure to diverse content.
+
+To reduce this risk, the system includes a **diversity penalty** that discourages recommending songs from the same artist or genre repeatedly. In real-world systems, additional safeguards such as diversity constraints, fairness monitoring, and regular auditing of recommendation outputs would also be important.
+
+### Reliability Observations
+
+Testing the system with different user profiles revealed an important pattern: when user preferences were clear and consistent, the recommender produced strong matches with high confidence scores. However, when the input preferences conflicted (for example, requesting ambient music with very high energy), the system produced weaker matches and triggered warning messages.
+
+This experiment highlighted an important lesson: AI systems should not only produce predictions, but also communicate **how reliable those predictions are**.
+
+### What This Project Taught Me
+
+This project showed how even simple recommendation algorithms can feel intelligent when they combine structured data with ranking logic. At the same time, it reinforced the importance of reliability checks, transparency, and evaluation in AI systems.
+
+Without guardrails and validation, recommendation systems can easily produce misleading outputs or reinforce bias. Designing systems that explain their reasoning and indicate their confidence is an important step toward building responsible AI applications.
+
+### Collaboration with AI
+
+AI tools played an important role during development. They helped generate code structure, suggest improvements to the scoring logic, and assist with debugging.
+
+One particularly helpful suggestion from AI was the idea of adding a **confidence scoring layer** that evaluates recommendation strength and detects contradictory user preferences. This feature improved transparency and made the system behave more like a responsible AI application.
+
+However, not all AI suggestions were correct. At one point, an AI-generated explanation assumed that certain features were used in the scoring algorithm even though they were not implemented in the code. This required manual verification and correction. This experience reinforced the importance of treating AI as a collaborator rather than a source of unquestioned answers.
