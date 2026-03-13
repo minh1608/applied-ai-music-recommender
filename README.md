@@ -214,3 +214,11 @@ AI tools played an important role during development. They helped generate code 
 One particularly helpful suggestion from AI was the idea of adding a **confidence scoring layer** that evaluates recommendation strength and detects contradictory user preferences. This feature improved transparency and made the system behave more like a responsible AI application.
 
 However, not all AI suggestions were correct. At one point, an AI-generated explanation assumed that certain features were used in the scoring algorithm even though they were not implemented in the code. This required manual verification and correction. This experience reinforced the importance of treating AI as a collaborator rather than a source of unquestioned answers.
+
+---
+
+## Portfolio Reflection
+
+This project demonstrates my approach to building responsible AI systems. Rather than focusing only on prediction accuracy, I focused on transparency, explainability, and reliability. I extended a simple recommendation algorithm into a modular system that includes confidence scoring, contradiction detection, and evaluation logic.
+
+This reflects how I think about AI engineering: building systems that are not only functional, but also understandable, testable, and trustworthy.
