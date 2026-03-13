@@ -169,6 +169,18 @@ Testing showed that the recommender produced consistent rankings for well-define
 
 ---
 
+## Reliability and Evaluation
+
+The system was tested with four user profiles: High-Energy Pop, Chill Lofi, Deep Intense Rock, and a conflicting ambient-intense profile.
+
+Clear and consistent profiles produced stronger recommendations and received **HIGH confidence** scores. For example, Chill Lofi and Deep Intense Rock both produced top recommendation scores above 6.0 and were labeled as high-confidence outputs.
+
+The conflicting profile triggered warning messages because the requested genre, mood, and energy level did not align well. In that case, the system returned recommendations with **LOW confidence** and explicitly noted that the profile contained contradictory preferences.
+
+This reliability layer makes the recommender more trustworthy by helping users understand not only what was recommended, but also how dependable those recommendations are.
+
+---
+
 ## Reflection
 
 This project showed how even simple recommendation algorithms can feel intelligent when they combine structured data with ranking logic.

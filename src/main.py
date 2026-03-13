@@ -1,12 +1,18 @@
-from .recommender import load_songs, recommend_songs
+from .recommender import load_songs, recommend_songs, evaluate_recommendations
 
 
 def print_recommendations(profile_name: str, user_prefs: dict, songs: list) -> None:
     recommendations = recommend_songs(user_prefs, songs, k=5)
+    evaluation = evaluate_recommendations(user_prefs, recommendations)
 
     print(f"\n=== {profile_name} ===")
     print(f"User profile: {user_prefs}")
     print("=" * 60)
+
+    for warning in evaluation["warnings"]:
+        print(f"WARNING: {warning}")
+    if evaluation["warnings"]:
+        print("-" * 60)
 
     for i, rec in enumerate(recommendations, start=1):
         song, score, explanation = rec
@@ -15,6 +21,16 @@ def print_recommendations(profile_name: str, user_prefs: dict, songs: list) -> N
         print(f"   Score: {score:.2f}")
         print(f"   Why: {explanation}")
         print("-" * 60)
+
+    print(
+        f"System confidence: {evaluation['confidence_label']} "
+        f"({evaluation['confidence_score']:.2f})"
+    )
+
+    for note in evaluation["notes"]:
+        print(f"Note: {note}")
+
+    print("=" * 60)
 
 
 def main() -> None:

@@ -1,6 +1,7 @@
 import csv
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 from dataclasses import dataclass
+
 
 @dataclass
 class Song:
@@ -19,6 +20,7 @@ class Song:
     danceability: float
     acousticness: float
 
+
 @dataclass
 class UserProfile:
     """
@@ -30,6 +32,7 @@ class UserProfile:
     target_energy: float
     likes_acoustic: bool
 
+
 class Recommender:
     """
     OOP implementation of the recommendation logic.
@@ -39,12 +42,11 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
         return self.songs[:k]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
         return "Explanation placeholder"
+
 
 def load_songs(csv_path: str) -> List[Dict]:
     """
@@ -72,6 +74,7 @@ def load_songs(csv_path: str) -> List[Dict]:
 
     return songs
 
+
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     """
     Calculate a weighted recommendation score for one song and explain why.
@@ -79,30 +82,25 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     score = 0.0
     reasons: List[str] = []
 
-    # Genre match
     if song["genre"] == user_prefs["genre"]:
         score += 1.0
         reasons.append("genre match (+1.0)")
 
-    # Mood match
     if song["mood"] == user_prefs["mood"]:
         score += 1.5
         reasons.append("mood match (+1.5)")
 
-    # Energy similarity
     energy_similarity = 1 - abs(song["energy"] - user_prefs["energy"])
     energy_points = energy_similarity * 4.0
     score += energy_points
     reasons.append(f"energy similarity (+{energy_points:.2f})")
 
-    # Optional tempo preference
     if "tempo" in user_prefs:
         tempo_similarity = 1 - min(abs(song["tempo_bpm"] - user_prefs["tempo"]) / 100, 1)
         tempo_points = tempo_similarity * 1.5
         score += tempo_points
         reasons.append(f"tempo similarity (+{tempo_points:.2f})")
 
-    # Optional valence preference
     if "valence" in user_prefs:
         valence_similarity = 1 - abs(song["valence"] - user_prefs["valence"])
         valence_points = valence_similarity * 1.0
@@ -110,6 +108,7 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
         reasons.append(f"valence similarity (+{valence_points:.2f})")
 
     return score, reasons
+
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
     """
@@ -167,3 +166,80 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tup
         ]
 
     return selected_recommendations
+
+
+def detect_profile_warnings(user_prefs: Dict) -> List[str]:
+    """
+    Detect contradictory or risky user preference combinations.
+    """
+    warnings: List[str] = []
+
+    chill_genres = {"ambient", "lofi", "jazz"}
+    intense_moods = {"intense", "aggressive"}
+    calm_moods = {"chill", "relaxed", "peaceful"}
+
+    if user_prefs["genre"] in chill_genres and user_prefs["mood"] in intense_moods:
+        warnings.append("User preferences may be contradictory: calm genre with intense mood.")
+
+    if user_prefs["genre"] == "ambient" and user_prefs["energy"] >= 0.8:
+        warnings.append("User preferences may be contradictory: ambient music usually has lower energy.")
+
+    if user_prefs["mood"] in calm_moods and user_prefs["energy"] >= 0.85:
+        warnings.append("User preferences may be contradictory: calm mood with very high energy.")
+
+    return warnings
+
+
+def calculate_confidence(
+    recommendations: List[Tuple[Dict, float, str]],
+    warnings: List[str]
+) -> Tuple[str, float]:
+    """
+    Estimate confidence based on top recommendation strength and warnings.
+    """
+    if not recommendations:
+        return "LOW", 0.0
+
+    top_score = recommendations[0][1]
+
+    if warnings:
+        if top_score >= 5.5:
+            return "MEDIUM", 0.65
+        return "LOW", 0.35
+
+    if top_score >= 5.5:
+        return "HIGH", 0.90
+    if top_score >= 4.0:
+        return "MEDIUM", 0.70
+    return "LOW", 0.45
+
+
+def evaluate_recommendations(
+    user_prefs: Dict,
+    recommendations: List[Tuple[Dict, float, str]]
+) -> Dict:
+    """
+    Run reliability checks and return warnings, confidence, and evaluation notes.
+    """
+    warnings = detect_profile_warnings(user_prefs)
+    confidence_label, confidence_score = calculate_confidence(recommendations, warnings)
+
+    notes: List[str] = []
+
+    if recommendations:
+        top_score = recommendations[0][1]
+        notes.append(f"Top recommendation score: {top_score:.2f}")
+
+        top_genres = [song["genre"] for song, _, _ in recommendations[:3]]
+        if len(set(top_genres)) == 1:
+            notes.append("Top results are concentrated in one genre.")
+
+    if warnings:
+        notes.append("One or more user preference contradictions were detected.")
+
+    return {
+        "warnings": warnings,
+        "confidence_label": confidence_label,
+        "confidence_score": confidence_score,
+        "notes": notes,
+    }
